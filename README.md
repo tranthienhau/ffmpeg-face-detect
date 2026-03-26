@@ -120,28 +120,132 @@ app/src/main/
 
 ### FFmpeg Setup
 
-Download prebuilt FFmpeg Android libraries or build from source:
+Build FFmpeg for Android from source, or use prebuilt binaries.
+
+**Build from source (macOS/Linux):**
 
 ```bash
-# Place prebuilt libs in:
+# 1. Clone FFmpeg
+git clone https://git.ffmpeg.org/ffmpeg.git
+cd ffmpeg
+
+# 2. Set NDK path
+export ANDROID_NDK=/path/to/android-ndk  # e.g. ~/Library/Android/sdk/ndk/26.1.10909125
+
+# 3. Build for arm64-v8a
+./configure \
+  --prefix=output/arm64-v8a \
+  --target-os=android \
+  --arch=aarch64 \
+  --cpu=armv8-a \
+  --enable-cross-compile \
+  --cross-prefix=$ANDROID_NDK/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android- \
+  --cc=$ANDROID_NDK/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android24-clang \
+  --cxx=$ANDROID_NDK/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android24-clang++ \
+  --sysroot=$ANDROID_NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot \
+  --enable-shared \
+  --disable-static \
+  --disable-doc \
+  --disable-programs \
+  --disable-everything \
+  --enable-decoder=h264,hevc \
+  --enable-demuxer=rtsp,rtp,sdp \
+  --enable-protocol=tcp,udp,rtp \
+  --enable-swscale \
+  --enable-avformat \
+  --enable-avcodec
+
+make -j$(nproc) && make install
+
+# 4. Build for armeabi-v7a
+make clean
+./configure \
+  --prefix=output/armeabi-v7a \
+  --target-os=android \
+  --arch=arm \
+  --cpu=armv7-a \
+  --enable-cross-compile \
+  --cross-prefix=$ANDROID_NDK/toolchains/llvm/prebuilt/darwin-x86_64/bin/armv7a-linux-androideabi- \
+  --cc=$ANDROID_NDK/toolchains/llvm/prebuilt/darwin-x86_64/bin/armv7a-linux-androideabi24-clang \
+  --cxx=$ANDROID_NDK/toolchains/llvm/prebuilt/darwin-x86_64/bin/armv7a-linux-androideabi24-clang++ \
+  --sysroot=$ANDROID_NDK/toolchains/llvm/prebuilt/darwin-x86_64/sysroot \
+  --enable-shared \
+  --disable-static \
+  --disable-doc \
+  --disable-programs \
+  --disable-everything \
+  --enable-decoder=h264,hevc \
+  --enable-demuxer=rtsp,rtp,sdp \
+  --enable-protocol=tcp,udp,rtp \
+  --enable-swscale \
+  --enable-avformat \
+  --enable-avcodec
+
+make -j$(nproc) && make install
+```
+
+**Copy output to project:**
+
+```bash
+# Headers (same for both ABIs)
+cp -r output/arm64-v8a/include/* app/src/main/cpp/third_party/ffmpeg/include/
+
+# Shared libraries
+cp output/arm64-v8a/lib/*.so app/src/main/cpp/third_party/ffmpeg/lib/arm64-v8a/
+cp output/armeabi-v7a/lib/*.so app/src/main/cpp/third_party/ffmpeg/lib/armeabi-v7a/
+```
+
+**Expected structure:**
+
+```
 app/src/main/cpp/third_party/ffmpeg/
-├── include/          # FFmpeg headers
+├── include/
 │   ├── libavformat/
 │   ├── libavcodec/
 │   ├── libavutil/
 │   └── libswscale/
 └── lib/
-    ├── arm64-v8a/    # .so files for arm64
-    └── armeabi-v7a/  # .so files for armv7
+    ├── arm64-v8a/
+    │   ├── libavformat.so
+    │   ├── libavcodec.so
+    │   ├── libavutil.so
+    │   └── libswscale.so
+    └── armeabi-v7a/
+        ├── libavformat.so
+        ├── libavcodec.so
+        ├── libavutil.so
+        └── libswscale.so
 ```
 
 ### OpenCV Setup
 
-Download OpenCV Android SDK and place it:
+Download [OpenCV Android SDK](https://opencv.org/releases/) and extract it:
 
 ```bash
+# Download and extract OpenCV 4.9.0 Android SDK
+wget https://github.com/opencv/opencv/releases/download/4.9.0/opencv-4.9.0-android-sdk.zip
+unzip opencv-4.9.0-android-sdk.zip
+
+# Copy SDK to project
+cp -r OpenCV-android-sdk/sdk app/src/main/cpp/third_party/opencv/sdk
+```
+
+**Expected structure:**
+
+```
 app/src/main/cpp/third_party/opencv/
-└── sdk/native/jni/   # OpenCVConfig.cmake lives here
+└── sdk/
+    ├── native/
+    │   ├── jni/              # OpenCVConfig.cmake lives here
+    │   ├── staticlibs/
+    │   │   ├── arm64-v8a/    # .a files for arm64
+    │   │   └── armeabi-v7a/  # .a files for armv7
+    │   └── 3rdparty/
+    │       └── libs/
+    │           ├── arm64-v8a/
+    │           └── armeabi-v7a/
+    └── etc/
+        └── haarcascades/     # Face detection cascade XML files
 ```
 
 ### Build & Run
