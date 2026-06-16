@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         stopBtn = findViewById(R.id.btn_stop)
         faceCountText = findViewById(R.id.face_count)
 
-        urlInput.setText("rtsp://10.182.100.68:8554/stream")
+        urlInput.setText("rtsp://10.0.2.2:8554/stream")
 
         surfaceView.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {}

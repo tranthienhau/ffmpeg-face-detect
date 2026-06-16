@@ -24,7 +24,9 @@ bool RtspDecoder::open(const std::string& rtsp_url) {
     int ret = avformat_open_input(&fmt_ctx_, rtsp_url.c_str(), nullptr, &opts);
     av_dict_free(&opts);
     if (ret < 0) {
-        LOGE("Failed to open RTSP stream: %s", rtsp_url.c_str());
+        char errbuf[256] = {0};
+        av_strerror(ret, errbuf, sizeof(errbuf));
+        LOGE("Failed to open RTSP stream: %s (ret=%d: %s)", rtsp_url.c_str(), ret, errbuf);
         return false;
     }
 
