@@ -2,11 +2,21 @@
 
 A native Android app using **C++ (NDK)** to receive an **RTSP** video stream via **FFmpeg**, run **face detection** on each frame using **OpenCV**, and display the annotated video in real-time.
 
-## Screenshot
+## Demo
 
 <p align="center">
-  <img src="screenshots/screenshot-1774508101254.png" width="300" alt="FFmpeg Face Detect - real-time face detection on RTSP stream"/>
+  <img src="screenshots/demo.gif" width="300" alt="FFmpeg Face Detect - real-time face detection on RTSP stream"/>
 </p>
+
+## Screenshots
+
+| Stream connecting | Face detected | Multi-face |
+|---|---|---|
+| ![Stream connecting](screenshots/01-stream-connecting.png) | ![Face detected](screenshots/02-face-detected.png) | ![Multi-face](screenshots/03-multi-face.png) |
+
+| Tracking | Tracking (2) |
+|---|---|
+| ![Tracking](screenshots/04-tracking.png) | ![Tracking 2](screenshots/05-tracking-2.png) |
 
 ## What This Demonstrates
 
